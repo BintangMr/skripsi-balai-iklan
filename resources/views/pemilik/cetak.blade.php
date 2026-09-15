@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan_Resmi_Pemesanan_Iklan.pdf</title>
+    <link rel="icon" href="{{ asset('balai_iklan.jpeg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -12,7 +13,7 @@
     </style>
 </head>
 <body class="bg-gray-100 p-8 flex justify-center" onload="window.print()">
-    <div class="w-full max-w-4xl bg-white p-10 shadow-lg border rounded">
+    <div class="w-full max-w-5xl bg-white p-10 shadow-lg border rounded">
         
         <div class="text-center border-b-4 border-slate-900 pb-4 mb-6">
             <h1 class="text-3xl font-bold text-slate-900 tracking-wide">PT. BALAI IKLAN BANDUNG</h1>
@@ -28,32 +29,42 @@
                     <th class="p-3 border border-gray-300 text-center">No. Invoice</th>
                     <th class="p-3 border border-gray-300">Nama Pelanggan</th>
                     <th class="p-3 border border-gray-300 text-center">Jenis Layanan</th>
+                    <th class="p-3 border border-gray-300 text-right">Subtotal (Tanpa PPN)</th>
+                    <th class="p-3 border border-gray-300 text-right">Pajak (PPN 11%)</th>
                     <th class="p-3 border border-gray-300 text-center">Tanggal Bayar</th>
+                    <th class="p-3 border border-gray-300 text-center">Tanggal Terbit</th>
                     <th class="p-3 border border-gray-300 text-right">Total Asli (Inc. PPN)</th>
                 </tr>
             </thead>
             <tbody>
                 @php $grandTotal = 0; @endphp
                 
-                @foreach($laporans as $laporan)
+                @forelse($laporans as $laporan)
+                @php
+                    $subtotal = $laporan->total_biaya / 1.11;
+                    $ppn = $laporan->total_biaya - $subtotal;
+                @endphp
                 <tr class="border-b border-gray-200">
                     <td class="p-3 border border-gray-300 text-center font-bold text-blue-700">
                         #INV-202605{{ str_pad($laporan->id, 2, '0', STR_PAD_LEFT) }}
                     </td>
                     <td class="p-3 border border-gray-300 font-medium">{{ $laporan->nama_pelanggan }}</td>
                     <td class="p-3 border border-gray-300 text-center">Iklan {{ $laporan->jenis_iklan }}</td>
-                    <td class="p-3 border border-gray-300 text-center">
-                        {{ $laporan->tgl_bayar ? \Carbon\Carbon::parse($laporan->tgl_bayar)->format('d M Y') : '-' }}
-                    </td>
-                    <td class="p-3 border border-gray-300 text-right font-bold text-gray-900">
-                        Rp {{ number_format($laporan->total_biaya, 0, ',', '.') }}
-                    </td>
+                    <td class="p-3 border border-gray-300 text-right">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                    <td class="p-3 border border-gray-300 text-right text-red-600">Rp {{ number_format($ppn, 0, ',', '.') }}</td>
+                    <td class="p-3 border border-gray-300 text-center">{{ $laporan->tgl_bayar ? \Carbon\Carbon::parse($laporan->tgl_bayar)->format('d M Y') : '-' }}</td>
+                    <td class="p-3 border border-gray-300 text-center">{{ $laporan->tgl_tayang ? \Carbon\Carbon::parse($laporan->tgl_tayang)->translatedFormat('d M Y') : '-' }}</td>
+                    <td class="p-3 border border-gray-300 text-right font-bold text-gray-900">Rp {{ number_format($laporan->total_biaya, 0, ',', '.') }}</td>
                 </tr>
                 @php $grandTotal += $laporan->total_biaya; @endphp
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="8" class="p-6 text-center text-red-500 font-bold border border-gray-300">Data laporan kosong.</td>
+                </tr>
+                @endforelse
                 
                 <tr class="bg-slate-50 font-bold">
-                    <td colspan="4" class="p-3 border border-gray-300 text-right uppercase">Total Akumulasi Pendapatan Bersih:</td>
+                    <td colspan="7" class="p-3 border border-gray-300 text-right uppercase">Total Akumulasi Pendapatan Bersih:</td>
                     <td class="p-3 border border-gray-300 text-right text-sm text-emerald-700">
                         Rp {{ number_format($grandTotal, 0, ',', '.') }}
                     </td>

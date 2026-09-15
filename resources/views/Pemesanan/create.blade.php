@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Pendaftaran Iklan - PT. Balai Iklan</title>
+    <link rel="icon" href="{{ asset('balai_iklan.jpeg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style> #form-baris { display: none; } </style>
+    <style> 
+        #form-baris { display: none; } 
+        /* Custom scrollbar untuk grid OTP agar rapi di layar kecil */
+        .otp-scroll::-webkit-scrollbar { height: 6px; }
+        .otp-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 antialiased">
 
@@ -31,7 +37,6 @@
             <h1 class="text-2xl font-bold text-gray-900">Formulir Pendaftaran Iklan Baru</h1>
             <p class="text-gray-500 text-sm mt-1">Lengkapi data di bawah ini sesuai dengan ketentuan perusahaan.</p>
         </div>
-
 
         <div class="flex flex-col lg:flex-row gap-8">
             <div class="w-full lg:w-2/3 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -73,17 +78,30 @@
                         </div>
 
                         <div class="mb-6">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Ukuran Kolom & Tinggi (Minimal 2x50)</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Simulasi Tampilan Iklan di Koran</label>
+                            <div class="relative w-full border border-gray-300 rounded-lg shadow-sm overflow-hidden bg-gray-900 flex justify-center p-4">
+                                <div class="relative inline-block">
+                                    <img src="{{ asset('images/template-koran.png') }}" alt="Template Koran" class="max-h-[450px] w-auto object-contain block mx-auto opacity-90">
+                                    <div id="boxVisualisasi" class="absolute top-[35%] left-1/2 -translate-x-1/2 border-2 border-dashed border-teal-400 bg-white/95 p-1 rounded shadow-md transition-all duration-150 flex items-center justify-center overflow-hidden" style="width: 30%; height: 25%;">
+                                        <img id="visualisasiKoran" src="" class="hidden w-full h-full object-fill" alt="Preview Visualisasi">
+                                        <p id="teksVisualisasi" class="text-[10px] text-teal-800 font-semibold text-center px-1">Area Iklan (2 Kolom x 50 mm)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Ukuran Kolom & Tinggi (Minimal 2x50, Maksimal 7x540)</label>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <div class="flex">
-                                        <input type="number" id="inputLebar" name="lebar_kolom" value="2" min="2" class="w-full border border-r-0 border-gray-300 rounded-l-md px-3 py-2 focus:ring-teal-500 focus:border-teal-500">
+                                        <input type="number" id="inputLebar" name="lebar_kolom" value="2" min="2" max="7" class="w-full border border-r-0 border-gray-300 rounded-l-md px-3 py-2 focus:ring-teal-500 focus:border-teal-500">
                                         <span class="bg-gray-50 border border-gray-300 border-l-0 rounded-r-md px-3 py-2 text-sm text-gray-500">Kolom</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div class="flex">
-                                        <input type="number" id="inputTinggi" name="tinggi_mm" value="50" min="50" class="w-full border border-r-0 border-gray-300 rounded-l-md px-3 py-2 focus:ring-teal-500 focus:border-teal-500">
+                                        <input type="number" id="inputTinggi" name="tinggi_mm" value="50" min="50" max="540" class="w-full border border-r-0 border-gray-300 rounded-l-md px-3 py-2 focus:ring-teal-500 focus:border-teal-500">
                                         <span class="bg-gray-50 border border-gray-300 border-l-0 rounded-r-md px-3 py-2 text-sm text-gray-500">mm</span>
                                     </div>
                                 </div>
@@ -91,18 +109,21 @@
                         </div>
                     </div>
 
-                    <!-- AREA FORM BARIS -->
+                    <!-- AREA FORM BARIS (GRID OTP) -->
                     <div id="area-form-baris" class="block">
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Materi Naskah (Maks 7 Baris / 182 Karakter)</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Materi Naskah (Maks 8 Baris / 208 Karakter)</label>
                             
-                            <textarea name="materi_teks" id="input_materi_teks" rows="4" 
-                                class="w-full border rounded-lg p-3 @error('materi_teks') border-red-500 @else border-gray-300 @enderror"
-                                minlength="52" maxlength="182" placeholder="Ketikkan naskah iklan Anda di sini...">{{ old('materi_teks') }}</textarea>
+                            <!-- Input hidden ini akan dikirim ke backend -->
+                            <input type="hidden" name="materi_teks" id="input_materi_teks" value="{{ old('materi_teks') }}">
+                            
+                            <div id="otp-container" class="otp-scroll overflow-x-auto py-4 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
+                                <!-- Kotak-kotak Grid akan di-generate oleh JavaScript di bawah -->
+                            </div>
                             
                             <div class="flex justify-between text-xs mt-2 px-1">
                                 <span class="text-red-500 font-medium">*Min: 2 Baris | 1 Baris = 26 Karakter</span>
-                                <span id="wordCount" class="text-gray-600 font-bold">0 Baris (0/182 Karakter)</span>
+                                <span id="wordCount" class="text-gray-600 font-bold">0 Baris (0/208 Karakter)</span>
                             </div>
                             
                             @error('materi_teks')
@@ -111,10 +132,10 @@
                         </div>
                     </div>
 
-                    <!-- INPUT TANGGAL UTAMA (Hanya ada 1 di luar tab agar tidak duplikat error) -->
+                    <!-- INPUT TANGGAL UTAMA -->
                     <div class="border-t pt-6 mt-6">
-                        <label class="text-sm font-semibold text-gray-700 block mb-1">Tanggal Mulai Terbit</label>
-                        <input type="date" name="tgl_tayang" class="w-full md:w-1/2 border rounded-md px-3 py-2 focus:ring-teal-500 focus:border-teal-500 @error('tgl_tayang') border-red-500 @else border-gray-300 @enderror">
+                    <label for="tgl_tayang" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Mulai Terbit</label>
+                        <input type="date" name="tgl_tayang" class="form-control w-full md:w-1/2 border rounded-md px-3 py-2 focus:ring-teal-500 focus:border-teal-500 @error('tgl_tayang') border-red-500 @else border-gray-300 @enderror" required >
                         @error('tgl_tayang')
                             <p class="text-red-500 text-xs font-bold mt-1">⚠️ {{ $message }}</p>
                         @enderror
@@ -178,21 +199,16 @@
     </div>
 
     <script>
-        // 1. Perbaikan ID elemen agar sesuai dengan HTML
         const inputLebar = document.getElementById('inputLebar');
         const inputTinggi = document.getElementById('inputTinggi');
-        const inputMateri = document.getElementById('input_materi_teks'); // ID sudah disamakan
         
-        // 2. Event Listener untuk kalkulasi otomatis saat mengetik
         if(inputLebar) inputLebar.addEventListener('input', updateKalkulasi);
         if(inputTinggi) inputTinggi.addEventListener('input', updateKalkulasi);
-        if(inputMateri) inputMateri.addEventListener('input', updateKalkulasi);
 
-        // 3. Fungsi Kalkulasi Utama
+        // Fungsi Kalkulasi
         function updateKalkulasi() {
-            // PERBAIKAN: Mengambil value dari input hidden, bukan radio button
             const inputJenis = document.getElementById('input_jenis_iklan');
-            if(!inputJenis) return; // Hentikan jika elemen tidak ada
+            if(!inputJenis) return; 
             
             const jenisAktif = inputJenis.value; 
             let subtotal = 0;
@@ -206,9 +222,12 @@
                 document.querySelectorAll('.calc-baris-only').forEach(el => el.style.display = 'none');
 
                 let lebar = parseInt(inputLebar.value) || 2;
-                if (lebar < 2) lebar = 2; 
+                if (lebar < 2) lebar = 2;
+                if (lebar > 7) lebar = 7;
+
                 let tinggi = parseInt(inputTinggi.value) || 50;
                 if (tinggi < 50) tinggi = 50;
+                if (tinggi > 540) tinggi = 540;
                 
                 let dimensi = lebar * tinggi;
 
@@ -218,25 +237,36 @@
 
                 subtotal = dimensi * 55000;
 
+                let persentaseLebar = (lebar / 7) * 75; 
+                let persentaseTinggi = (tinggi / 540) * 50; 
+
+                const boxVisualisasi = document.getElementById('boxVisualisasi');
+                if(boxVisualisasi) {
+                    boxVisualisasi.style.width = persentaseLebar + '%';
+                    boxVisualisasi.style.height = persentaseTinggi + 'px';
+                }
+
             } else {
                 document.getElementById('calcJenis').innerText = 'Iklan Baris';
                 document.getElementById('calcTarif').innerText = 'Rp 22.500 / Baris';
                 document.querySelectorAll('.calc-display-only').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.calc-baris-only').forEach(el => el.style.display = 'flex');
 
+                const inputMateri = document.getElementById('input_materi_teks');
                 let teks = inputMateri ? inputMateri.value : '';
-                let jumlahKarakter = teks.length; 
-                let jumlahBarisAsli = Math.ceil(jumlahKarakter / 26); 
                 
-                // Menghidupkan kembali update teks counter di bawah form
+                let barisArray = teks === '' ? [] : teks.split('\n');
+                let jumlahBarisAsli = barisArray.length;
+                let jumlahKarakter = teks.replace(/\n/g, '').length;
+                
                 const wordCountSpan = document.getElementById('wordCount');
                 if (wordCountSpan) {
-                    wordCountSpan.innerText = `${jumlahBarisAsli} Baris (${jumlahKarakter}/182 Karakter)`;
+                    wordCountSpan.innerText = `${jumlahBarisAsli} Baris (${jumlahKarakter}/208 Karakter)`;
                 }
 
-                // Kalkulasi harga (minimal bayar 2 baris)
                 let jumlah_baris = jumlahBarisAsli;
                 if (jumlah_baris < 2) jumlah_baris = 2; 
+                if (jumlah_baris > 8) jumlah_baris = 8;
 
                 document.getElementById('calcBaris').innerText = jumlah_baris + ' Baris';
                 subtotal = jumlah_baris * 22500;
@@ -250,12 +280,13 @@
             document.getElementById('calcTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
         }
 
-        // 4. Preview File Gambar (Tetap sama)
         function previewImage(event) {
             const input = event.target;
             const previewContainer = document.getElementById('previewContainer');
             const uploadPlaceholder = document.getElementById('uploadPlaceholder');
             const imagePreview = document.getElementById('imagePreview');
+            const visualisasiKoran = document.getElementById('visualisasiKoran');
+            const teksVisualisasi = document.getElementById('teksVisualisasi');
 
             if (input.files && input.files[0] && input.files[0].type.match('image.*')) {
                 const reader = new FileReader();
@@ -263,16 +294,27 @@
                     imagePreview.src = e.target.result;
                     previewContainer.classList.remove('hidden');
                     uploadPlaceholder.classList.add('hidden');
+
+                    if(visualisasiKoran && teksVisualisasi) {
+                        visualisasiKoran.src = e.target.result;
+                        visualisasiKoran.classList.remove('hidden');
+                        teksVisualisasi.classList.add('hidden');
+                    }
                 }
                 reader.readAsDataURL(input.files[0]);
             } else {
                 previewContainer.classList.add('hidden');
                 uploadPlaceholder.classList.remove('hidden');
                 imagePreview.src = "";
+
+                if(visualisasiKoran && teksVisualisasi) {
+                    visualisasiKoran.src = "";
+                    visualisasiKoran.classList.add('hidden');
+                    teksVisualisasi.classList.remove('hidden');
+                }
             }
         }
 
-        // 5. Fungsi Ganti Tab
         function gantiTabIklan(jenis) {
             const btnBaris = document.getElementById('btn-baris');
             const btnDisplay = document.getElementById('btn-display');
@@ -299,18 +341,144 @@
                 inputJenis.value = 'Display';          
             }
             
-            // PERBAIKAN: Panggil kalkulasi otomatis setiap kali tab ditekan agar harga langsung menyesuaikan
             updateKalkulasi();
         }
 
-        // 6. Jalankan saat halaman dimuat
+        // Jalankan saat DOM dimuat
         document.addEventListener("DOMContentLoaded", function() {
+            const otpContainer = document.getElementById('otp-container');
+            const MAX_ROWS = 8;
+            const COLS = 26;
+            let otpInputs = [];
+
+            if (otpContainer) {
+                let html = '<div class="flex flex-col gap-1.5 w-max">';
+                for(let r=0; r<MAX_ROWS; r++) {
+                    html += '<div class="flex gap-1.5 items-center">';
+                    html += `<span class="text-xs font-bold text-teal-600 w-4">${r+1}</span>`;
+                    for(let c=0; c<COLS; c++) {
+                        html += `<input type="text" maxlength="1" id="otp-${r}-${c}" class="otp-box w-6 h-8 text-center border border-gray-300 rounded text-sm font-bold text-gray-800 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 uppercase transition-all shadow-sm" autocomplete="off">`;
+                    }
+                    html += '</div>';
+                }
+                html += '</div>';
+                otpContainer.innerHTML = html;
+                otpInputs = Array.from(document.querySelectorAll('.otp-box'));
+
+                otpInputs.forEach((input, index) => {
+                    input.addEventListener('input', (e) => {
+                        if (input.value.length > 1) input.value = input.value.slice(-1);
+                        if (input.value !== ' ') input.value = input.value.toUpperCase();
+                        
+                        if (input.value && index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                        compileOtpText();
+                    });
+
+                    input.addEventListener('keydown', (e) => {
+                        // FIX BUG 2: Blokir aksi bawaan Enter, pindahkan fokus ke awal baris baru
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); 
+                            let nextRowFirstColIndex = Math.floor(index / COLS) * COLS + COLS;
+                            if (nextRowFirstColIndex < otpInputs.length) {
+                                otpInputs[nextRowFirstColIndex].focus();
+                            }
+                        } else if (e.key === 'Backspace') {
+                            if (!input.value && index > 0) {
+                                otpInputs[index - 1].focus();
+                                otpInputs[index - 1].value = '';
+                                e.preventDefault();
+                            }
+                            setTimeout(compileOtpText, 10);
+                        } else if (e.key === 'ArrowLeft' && index > 0) {
+                            otpInputs[index - 1].focus();
+                        } else if (e.key === 'ArrowRight' && index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        } else if (e.key === 'ArrowUp' && index >= COLS) {
+                            otpInputs[index - COLS].focus();
+                        } else if (e.key === 'ArrowDown' && index < otpInputs.length - COLS) {
+                            otpInputs[index + COLS].focus();
+                        }
+                    });
+
+                    input.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        let pasteData = e.clipboardData.getData('text').replace(/[\r\n]/g, '').trim().toUpperCase();
+                        let currIndex = index;
+                        for(let i=0; i<pasteData.length; i++) {
+                            if (currIndex < otpInputs.length) {
+                                otpInputs[currIndex].value = pasteData[i];
+                                currIndex++;
+                            }
+                        }
+                        if (currIndex < otpInputs.length) otpInputs[currIndex].focus();
+                        else otpInputs[otpInputs.length-1].focus();
+                        compileOtpText();
+                    });
+                });
+            }
+
+            function compileOtpText() {
+                let maxRowIndex = -1;
+                let constructedLines = [];
+                
+                for(let r=0; r<MAX_ROWS; r++) {
+                    // FIX BUG 1: Rekam posisi terakhir yang diisi (termasuk spasi yang diketik sengaja)
+                    let lastCharIndex = -1;
+                    for(let c=0; c<COLS; c++) {
+                        let val = document.getElementById(`otp-${r}-${c}`).value;
+                        if (val !== '') lastCharIndex = c;
+                    }
+                    
+                    let rowStr = '';
+                    if (lastCharIndex >= 0) {
+                        for(let c=0; c<=lastCharIndex; c++) {
+                            let val = document.getElementById(`otp-${r}-${c}`).value;
+                            // Ubah kotak kosong yang terapit menjadi spasi
+                            rowStr += val === '' ? ' ' : val; 
+                        }
+                    }
+                    
+                    constructedLines.push(rowStr);
+                    if(rowStr.length > 0) maxRowIndex = r;
+                }
+                
+                let finalLines = [];
+                if (maxRowIndex >= 0) {
+                    for(let r=0; r<=maxRowIndex; r++) {
+                        finalLines.push(constructedLines[r]);
+                    }
+                }
+                
+                const finalString = finalLines.join('\n');
+                const hiddenInput = document.getElementById('input_materi_teks');
+                if(hiddenInput) hiddenInput.value = finalString;
+
+                updateKalkulasi();
+            }
+
+            const hiddenInput = document.getElementById('input_materi_teks');
+            if(hiddenInput && hiddenInput.value) {
+                let lines = hiddenInput.value.split('\n');
+                for(let r=0; r<lines.length && r<MAX_ROWS; r++) {
+                    let rowText = lines[r];
+                    for(let c=0; c<rowText.length && c<COLS; c++) {
+                        let char = rowText[c];
+                        if(char !== ' ') {
+                            let box = document.getElementById(`otp-${r}-${c}`);
+                            if(box) box.value = char.toUpperCase();
+                        }
+                    }
+                }
+            }
+
             const inputJenis = document.getElementById('input_jenis_iklan');
             if (inputJenis) {
                 const jenisTerakhir = inputJenis.value || 'Baris';
                 gantiTabIklan(jenisTerakhir);
             }
-            updateKalkulasi(); // Hitung harga awal saat web baru dibuka
+            updateKalkulasi(); 
         });
     </script>
 </body>

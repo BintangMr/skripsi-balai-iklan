@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Tagihan - PT. Balai Iklan</title>
+    <link rel="icon" href="{{ asset('balai_iklan.jpeg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen">
@@ -13,6 +14,7 @@
             <a href="/dashboard-pelanggan" class="hover:text-teal-300">Beranda</a>
             <a href="/riwayat-pesanan" class="hover:text-teal-300">Riwayat Pesanan</a>
             <a href="/tagihan" class="text-teal-300 font-bold">Tagihan</a>
+            
             <div class="flex items-center space-x-2 border-l border-blue-700 pl-6">
                 <div class="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center font-bold text-white">{{ strtoupper(substr(session('nama', 'U'), 0, 1)) }}</div>
                 <span>{{ session('nama', 'Pengguna') }}</span>

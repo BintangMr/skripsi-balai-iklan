@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembayaran - PT. Balai Iklan</title>
+    <link rel="icon" href="{{ asset('balai_iklan.jpeg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 antialiased">
@@ -42,7 +43,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
                     <h3 class="font-bold text-gray-800 mb-4">Transfer ke Rekening Berikut:</h3>
                     <div class="border rounded-lg p-4 flex items-center justify-between mb-3 border-l-4 border-l-blue-500">
                         <div>
@@ -57,11 +58,26 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- DIALOG / TATACARA SOP PEMBAYARAN -->
+                <div class="bg-blue-50 border border-blue-200 p-5 rounded-xl text-blue-900">
+                    <h4 class="font-bold text-sm mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-1.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Tata Cara & SOP Pembayaran:
+                    </h4>
+                    <ol class="list-decimal pl-4 text-xs space-y-1.5 text-blue-800">
+                        <li>Lakukan transfer sesuai dengan nominal total tagihan di atas ke salah satu rekening PT Balai Iklan Bandung.</li>
+                        <li>Simpan struk atau ambil *screenshot* bukti transaksi Anda.</li>
+                        <li>Isi form konfirmasi di sebelah kanan (Pilih Bank tujuan, masukkan nama dan nomor rekening pengirim Anda).</li>
+                        <li>Unggah bukti transfer berformat JPG/PNG lalu klik tombol kirim.</li>
+                        <li>Bagian Keuangan akan memverifikasi mutasi bank dalam waktu maksimal 1x24 jam.</li>
+                    </ol>
+                </div>
             </div>
 
             <div class="bg-[#1e293b] text-white p-8 rounded-xl shadow-lg">
                 <h3 class="text-xl font-bold mb-2">Konfirmasi Pembayaran</h3>
-                <p class="text-xs text-gray-400 mb-6">Sudah melakukan transfer? Silakan unggah bukti pembayaran Anda di bawah ini untuk diverifikasi oleh Bagian Keuangan.</p>
+                <p class="text-xs text-gray-400 mb-6">Sudah melakukan transfer? Silakan lengkapi data di bawah ini untuk diverifikasi oleh Bagian Keuangan.</p>
                 
                 @if($errors->any())
                     <div class="bg-red-500 text-white text-xs p-4 rounded-lg mb-6 shadow-md border border-red-700">
@@ -75,15 +91,34 @@
 
                 <form action="/pembayaran/{{ $pesanan->id }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    
+                    <!-- FIELD 1: BANK TUJUAN TRANSFER -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Bank Tujuan Transfer</label>
+                        <select name="bank_tujuan" class="w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-sm text-white focus:ring-teal-500 focus:border-teal-500" required>
+                            <option value="" disabled selected>-- Pilih Bank Tujuan --</option>
+                            <option value="BCA">BCA (123 456 7890)</option>
+                            <option value="MANDIRI">MANDIRI (098 765 4321 123)</option>
+                        </select>
+                    </div>
+
+                    <!-- FIELD 2: NAMA PEMILIK REKENING PENGIRIM -->
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Pemilik Rekening Pengirim</label>
-                        <input type="text" name="nama_pengirim" class="w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-sm focus:ring-teal-500" placeholder="Contoh: Bintang Muhammad Rizqi" required>
+                        <input type="text" name="nama_pengirim" class="w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-sm text-white focus:ring-teal-500 focus:border-teal-500" placeholder="Contoh: Bintang Muhammad Rizqi" required>
+                    </div>
+
+                    <!-- FIELD 3: NOMOR REKENING PENGIRIM -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Nomor Rekening Pengirim</label>
+                        <input type="text" name="no_rekening_pengirim" class="w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-sm text-white focus:ring-teal-500 focus:border-teal-500" placeholder="Contoh: 1350294811" required>
                     </div>
                     
+                    <!-- FIELD 4: UNGGAH BUKTI TRANSFER -->
                     <div class="mb-6">
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Unggah Bukti Transfer (JPG/PNG)</label>
                         <div class="border-2 border-dashed border-slate-600 rounded-lg p-6 flex flex-col items-center justify-center bg-slate-800 hover:bg-slate-700 transition">
-                            <input type="file" name="bukti_transfer" class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600" required>
+                            <input type="file" name="bukti_transfer" accept="image/png, image/jpeg" class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600" required>
                         </div>
                     </div>
 
@@ -96,30 +131,25 @@
         </div>
     </div>
     <script>
-        // Mengambil waktu pesanan dibuat + 24 Jam (menggunakan format standar ISO dari Laravel)
         var deadline = new Date("{{ $pesanan->created_at->addHours(24)->format('Y-m-d\TH:i:s') }}").getTime();
 
         var x = setInterval(function() {
             var now = new Date().getTime();
             var distance = deadline - now;
 
-            // Kalkulasi jam, menit, dan detik
             var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Tampilkan hasilnya dengan format 00:00:00
             document.getElementById("timer").innerHTML = 
                 (hours < 10 ? "0" + hours : hours) + ":" + 
                 (minutes < 10 ? "0" + minutes : minutes) + ":" + 
                 (seconds < 10 ? "0" + seconds : seconds) + " WIB";
 
-            // Jika waktu habis, kunci halaman
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("timer").innerHTML = "KADALUARSA";
                 
-                // Matikan form dan ubah tombol jadi abu-abu
                 const btnSubmit = document.getElementById("btnSubmit");
                 btnSubmit.disabled = true;
                 btnSubmit.classList.remove('bg-teal-500', 'hover:bg-teal-600');

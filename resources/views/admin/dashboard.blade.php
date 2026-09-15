@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8"><title>Admin Panel - PT. Balai Iklan</title>
+    <link rel="icon" href="{{ asset('balai_iklan.jpeg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f4f7f6] font-sans text-gray-800 flex h-screen overflow-hidden">
@@ -29,7 +30,7 @@
             <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">A</div>
                 <div class="text-xs">
-                    <p class="text-white font-bold">Admin Staf</p>
+                    <p class="text-white font-bold">Staf</p>
                     <p class="text-gray-400">PT. Balai Iklan</p>
                 </div>
             </div>
@@ -107,6 +108,11 @@
                 <h3 class="font-bold text-sm text-gray-800">Pusat Laporan & Arsip</h3>
                 
                 <form action="/dashboard-admin" method="GET" class="flex space-x-2">
+                    <select name="jenis_iklan" class="border rounded px-3 py-1.5 text-xs bg-white text-gray-700 font-medium">
+                        <option value="">Semua Jenis Iklan</option>
+                        <option value="Baris" {{ request('jenis_iklan') == 'Baris' ? 'selected' : '' }}>Iklan Baris</option>
+                        <option value="Display" {{ request('jenis_iklan') == 'Display' ? 'selected' : '' }}>Iklan Display</option>
+                    </select>
                     <input type="text" name="cari_nama" placeholder="Cari Nama/Instansi..." value="{{ request('cari_nama') }}" class="border rounded px-3 py-1.5 text-xs w-48">
                     <input type="date" name="tgl_awal" value="{{ request('tgl_awal') }}" class="border rounded px-3 py-1.5 text-xs">
                     <input type="date" name="tgl_akhir" value="{{ request('tgl_akhir') }}" class="border rounded px-3 py-1.5 text-xs">
@@ -124,6 +130,7 @@
                             <th class="py-3 px-4">Pajak (PPN 11%)</th>
                             <th class="py-3 px-4 font-bold text-teal-300">Total Asli</th>
                             <th class="py-3 px-4">Tgl Order</th>
+                            <th class="py-3 px-4">Tgl Terbit</th>
                             <th class="py-3 px-4">Tgl & Jam Bayar</th>
                             <th class="py-3 px-4 text-center">Bukti Terbit</th>
                         </tr>
@@ -138,13 +145,14 @@
                                 <td class="py-3 px-4">
                                     <p class="font-bold text-blue-700">#INV-202605{{ str_pad($lap->id, 2, '0', STR_PAD_LEFT) }}</p>
                                     <p class="text-gray-600 font-semibold">{{ $lap->nama_pelanggan }}</p>
+                                    <span class="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold">Iklan {{ $lap->jenis_iklan }}</span>
                                 </td>
                                     <td class="py-3 px-4">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                                     <td class="py-3 px-4 text-red-600">Rp {{ number_format($ppn, 0, ',', '.') }}</td>
                                     <td class="py-3 px-4 font-bold text-teal-700 text-xs">Rp {{ number_format($lap->total_biaya, 0, ',', '.') }}</td>
                                     <td class="py-3 px-4 text-gray-500">{{ \Carbon\Carbon::parse($lap->tgl_pesan)->format('d M Y') }}</td>
-                                    <td class="py-3 px-4 text-gray-500">
-                                    {{ \Carbon\Carbon::parse($lap->tgl_bayar)->format('d M Y') }} <br>
+                                    <td class="py-3 px-4 text-gray-500">{{ $lap->tgl_tayang? \Carbon\Carbon::parse($lap->tgl_tayang)->translatedFormat('d M Y') : '-'}}</td>
+                                    <td class="py-3 px-4 text-gray-500">{{ \Carbon\Carbon::parse($lap->tgl_bayar)->format('d M Y') }} <br>
                                     <span class="font-bold text-gray-700">{{ \Carbon\Carbon::parse($lap->waktu_bayar)->format('H:i:s') }} WIB</span>
                                 </td>
                                 <td class="py-3 px-4 text-center">
@@ -172,7 +180,7 @@
                 @if($laporans->isEmpty())
                     <button type="button" onclick="alert('Arsip kosong! Tidak ada data yang bisa diekspor.')" class="bg-gray-400 text-white px-6 py-2 rounded text-xs font-bold cursor-not-allowed">Ekspor PDF Terkunci</button>
                 @else
-                    <a href="/laporan-pemilik/cetak?tgl_awal={{ request('tgl_awal') }}&tgl_akhir={{ request('tgl_akhir') }}&cari_nama={{ request('cari_nama') }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded text-xs font-bold shadow-md">Unduh Dokumen Laporan PDF</a>
+                    <a href="/laporan-pemilik/cetak?tgl_awal={{ request('tgl_awal') }}&tgl_akhir={{ request('tgl_akhir') }}&cari_nama={{ request('cari_nama') }}&jenis_iklan={{ request('jenis_iklan') }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded text-xs font-bold shadow-md">Unduh Dokumen Laporan PDF</a>
                 @endif
             </div>
         </div>

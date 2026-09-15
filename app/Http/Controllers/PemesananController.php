@@ -27,10 +27,10 @@ class PemesananController extends Controller
         ];
 
         if ($request->jenis_iklan === 'Baris') {
-            $rules['materi_teks'] = 'required|string|min:52|max:182';
+            $rules['materi_teks'] = 'required|string|min:52|max:208';
             $messages['materi_teks.required'] = 'Materi naskah iklan baris wajib diisi.';
             $messages['materi_teks.min'] = 'Naskah terlalu singkat. Harap masukkan minimal 52 karakter untuk memenuhi syarat.';
-            $messages['materi_teks.max'] = 'Naskah terlalu panjang. Maksimal hanya diperbolehkan 182 karakter (7 baris).';
+            $messages['materi_teks.max'] = 'Naskah terlalu panjang. Maksimal hanya diperbolehkan 208 karakter (8 baris).';
         } else {
             $rules['file_desain'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
             $messages['file_desain.required'] = 'File desain gambar wajib diunggah.';
@@ -49,11 +49,10 @@ class PemesananController extends Controller
             
             $materi_iklan = $request->input('materi_teks');
             
-            // Hitung panjang karakter (termasuk spasi)
-            $panjang_karakter = strlen($materi_iklan);
-            
-            // 1 baris = 26 karakter (Dibulatkan ke atas)
-            $jumlah_baris = ceil($panjang_karakter / 26);
+            // REVISI PAK SYAHRUL: Menghitung baris berdasarkan Enter (newline fisik)
+            // Menyeragamkan format baris baru, lalu memecahnya menjadi array
+            $barisArray = explode("\n", str_replace("\r\n", "\n", $materi_iklan));
+            $jumlah_baris = count($barisArray);
             
             // Aturan Minimal 2 baris
             if ($jumlah_baris < 2) {
@@ -61,8 +60,8 @@ class PemesananController extends Controller
             }
 
             // Aturan Maksimal 7 baris (Validasi keamanan ganda)
-            if ($jumlah_baris > 7) {
-                return back()->withErrors(['materi_teks' => 'Maksimal iklan baris adalah 7 baris (182 karakter).']);
+            if ($jumlah_baris > 8) {
+                return back()->withErrors(['materi_teks' => 'Maksimal iklan baris adalah 7 baris (208 karakter).']);
             }
             
             $qty_atau_ukuran = $jumlah_baris;
@@ -99,7 +98,17 @@ class PemesananController extends Controller
         $pesanan->tgl_pesan = Carbon::now();
         $pesanan->jenis_iklan = $request->jenis_iklan;
         $pesanan->materi_iklan = $materi_iklan;
+        $pesanan->tgl_tayang = $request->tgl_tayang;
+        
+        // Simpan jumlah baris atau total mmK ke kolom bawaan
         $pesanan->qty_atau_ukuran = $qty_atau_ukuran;
+        
+        // TAMBAHAN: Simpan detail ukuran spesifik hanya jika Iklan Display
+        if ($request->jenis_iklan === 'Display') {
+            $pesanan->lebar_kolom = $request->input('lebar_kolom');
+            $pesanan->tinggi_mm = $request->input('tinggi_mm');
+        }
+
         $pesanan->total_biaya = $total_biaya;
         $pesanan->status = 'Menunggu Pembayaran'; 
         $pesanan->save();
@@ -110,11 +119,12 @@ class PemesananController extends Controller
     public function tagihan()
     {
         $tagihans = Pemesanan::where('pelanggan_id', session('user_id'))
-            ->whereIn('status', ['Menunggu Pembayaran', 'Bukti Tidak Valid']) // TAMBAHKAN INI
+            ->whereIn('status', ['Menunggu Pembayaran', 'Bukti Tidak Valid']) 
             ->orderBy('created_at', 'desc')
             ->get();
         return view('pemesanan.tagihan', compact('tagihans'));
     }
+    
     public function riwayat()
     {
         // Ambil semua riwayat pesanan milik pelanggan yang sedang login, diurutkan dari yang terbaru

@@ -40,6 +40,7 @@
                             <th class="py-3 px-4">Pajak (PPN 11%)</th>
                             <th class="py-3 px-4 font-bold text-teal-300">Total Asli</th>
                             <th class="py-3 px-4">Tgl Order</th>
+                            <th class="py-3 px-4">Tgl Terbit</th>
                             <th class="py-3 px-4">Tgl & Jam Bayar</th>
                         </tr>
                     </thead>
@@ -58,9 +59,9 @@
                                 <td class="py-3 px-4 text-red-600">Rp {{ number_format($ppn, 0, ',', '.') }}</td>
                                 <td class="py-3 px-4 font-bold text-teal-700 text-xs">Rp {{ number_format($lap->total_biaya, 0, ',', '.') }}</td>
                                 <td class="py-3 px-4 text-gray-500">{{ \Carbon\Carbon::parse($lap->tgl_pesan)->format('d M Y') }}</td>
-                                <td class="py-3 px-4 text-gray-500">
-                                    {{ \Carbon\Carbon::parse($lap->tgl_bayar)->format('d M Y') }} <br>
-                                    <span class="font-bold text-gray-700">{{ \Carbon\Carbon::parse($lap->waktu_bayar)->format('H:i:s') }} WIB</span>
+                                <td class="py-3 px-4 text-gray-500">{{ $lap->tgl_tayang? \Carbon\Carbon::parse($lap->tgl_tayang)->translatedFormat('d M Y') : '-'}}</td>
+                                <td class="py-3 px-4 text-gray-500">{{ \Carbon\Carbon::parse($lap->tgl_bayar)->format('d M Y') }} <br>
+                                <span class="font-bold text-gray-700">{{ \Carbon\Carbon::parse($lap->waktu_bayar)->format('H:i:s') }} WIB</span>
                                 </td>
                             </tr>
                         @empty

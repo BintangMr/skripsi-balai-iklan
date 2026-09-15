@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8"><title>Data Pelanggan Terdaftar - PT. Balai Iklan</title>
+    <link rel="icon" href="{{ asset('balai_iklan.jpeg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f4f7f6] font-sans text-gray-800 flex h-screen overflow-hidden">
@@ -37,8 +38,8 @@
         @endif
 
         <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-900">Database Master Pelanggan</h1>
-            <p class="text-xs text-gray-500 mt-1">Kelola data pelanggan dan eliminasi akun yang sudah tidak aktif menggunakan kontrol penuh.</p>
+            <h1 class="text-2xl font-bold text-gray-900">Data Pelanggan</h1>
+            <p class="text-xs text-gray-500 mt-1">Melihat data pelanggan dan meninjau terakhir login.</p>
         </div>
 
         <div class="bg-white border rounded-xl shadow-sm overflow-hidden">

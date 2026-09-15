@@ -24,6 +24,9 @@ class PembayaranController extends Controller
         $pesanan = Pemesanan::findOrFail($id);
 
         $request->validate([
+            'bank_tujuan' => 'required|string',
+            'nama_pengirim' => 'required|string|max:255',
+            'no_rekening_pengirim' => 'required|string|max:50',
             'bukti_transfer' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
@@ -34,6 +37,9 @@ class PembayaranController extends Controller
         $pembayaran = new Pembayaran();
         $pembayaran->pemesanan_id = $pesanan->id;
         $pembayaran->tgl_bayar = Carbon::now();
+        $pembayaran->bank_tujuan = $request->bank_tujuan;
+        $pembayaran->nama_pengirim = $request->nama_pengirim;
+        $pembayaran->no_rekening_pengirim = $request->no_rekening_pengirim;
         $pembayaran->bukti_transfer = $pathGambar;
         $pembayaran->status_bayar = 'Menunggu'; 
         $pembayaran->save();
@@ -52,8 +58,10 @@ class PembayaranController extends Controller
         $pesanan = Pemesanan::findOrFail($id);
         
         // Ambil data pelanggan yang berelasi dengan pesanan ini
-        $pelanggan = Pelanggan::find($pesanan->pelanggan_id);
+        $pelanggan = Pelanggan::where('login_id', $pesanan->pelanggan_id)->first();
 
-        return view('pembayaran.kuitansi', compact('pesanan', 'pelanggan'));
+        $pembayaran = Pembayaran::where('pemesanan_id', $id)->latest()->first();
+
+        return view('pembayaran.kuitansi', compact('pesanan', 'pelanggan', 'pembayaran'));
     }
 }

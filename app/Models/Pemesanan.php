@@ -12,6 +12,7 @@ class Pemesanan extends Model
         'pelanggan_id', 
         'jenis_iklan', 
         'tgl_pesan', 
+        'tgl_tayang',
         'total_biaya', 
         'status', 
         'qty_atau_ukuran', 

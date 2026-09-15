@@ -28,6 +28,9 @@ class AdminController extends Controller
             ->where('pembayarans.status_bayar', 'Valid');
 
         // Filter Nama/Instansi
+        if ($request->filled('jenis_iklan')) {
+            $queryLaporan->where('pemesanans.jenis_iklan', $request->jenis_iklan);
+        }
         if ($request->cari_nama) {
             $queryLaporan->where('pelanggans.nama', 'like', '%' . $request->cari_nama . '%');
         }

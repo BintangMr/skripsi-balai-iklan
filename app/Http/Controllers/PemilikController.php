@@ -45,6 +45,9 @@ class PemilikController extends Controller
             ->where('pemesanans.status', 'Lunas'); // Filter hanya yang lunas
 
         // Tangkap filter jika ada
+        if ($request->filled('jenis_iklan')) {
+            $query->where('pemesanans.jenis_iklan', $request->jenis_iklan);
+        }
         if ($request->cari_nama) {
             $query->where('pelanggans.nama', 'like', '%' . $request->cari_nama . '%');
         }
